@@ -1,7 +1,5 @@
 <?php
    include('session.php');
-   $sql_query = "SELECT * FROM menus ORDER BY child_index, parent_menu";
-	$result = mysqli_query($con,$sql_query);
 ?>
 <html>
    
@@ -16,21 +14,7 @@
 
       <div class="results">
          <?php
-            if (mysqli_num_rows($result) > 0) {
-               // output data of each row
-               while($row = mysqli_fetch_assoc($result)) {
-                  //asort($row);
-                  if(empty($row['parent_menu'])) {
-                     echo "<input id='name' data-id='".$row['id']."' class='parent' type='text' value='".$row['menu_name']."'>
-                           <input data-parentid='".$row['id']."' id='add' type='button' value='+'>
-                           <input id='remove' type='button' value='-'><br />";
-                  } else {
-                     echo "<input id='name' data-id='".$row['id']."' style='margin-left:".$row['child_index']."rem;' class='child' type='text' value='".$row['menu_name']."'>
-                           <input data-parentid='".$row['id']."' data-childindex='".$row['child_index']."' id='add' type='button' value='+'>
-                           <input id='remove' type='button' value='-'><br />";
-                  }
-               }
-            }
+            include('menu_view.php');
          ?>
       </div>
 
@@ -38,10 +22,27 @@
 
       <script>
 
-         $("[id=add]").click(function() {
+         $(".results").on('click', '[id=remove]', function() {
+            // Remove database line with correct id and cascade rule removes child menus as well
+            let id = $(this).parent().data('id')
+            $.post(
+               'delete.php',
+               {
+                  id: id
+               },
+               function(result){
+                  $(".results").empty()
+                  $(".results").html(result)
+               }
+            )
+         })
+
+         $(".results").on('click', '[id=add]', function() {
             // Add new database line for menu with correct parentId, empty name and corresponding child index
-            let parent_menu = $(this).data('parentid')
-            let child_index = $(this).data('childindex') ? $(this).data('childindex') + 1 : 1
+            let parent_menu = $(this).parents('.parent') ? $(this).parent().data('id') : 0
+            // Ternary because adding a 1 to undefined or NaN value does not work
+            let child_index = $(this).parent().data('childindex') ? $(this).parent().data('childindex') + 1 : 1
+            console.log('parent_menu: ' + $(this).parents('.parent') ? $(this).parent().data('id') : 0)
             $.post(
                'insert.php',
                {
@@ -49,26 +50,22 @@
                   child_index: child_index
                },
                function(result){
-                  console.log(parent_menu + ' - ' + child_index)
                   $(".results").empty()
                   $(".results").html(result)
                }
             )
          })
 
-         $('[id=name]').on('input',function(e){
+         $(".results").on('input', '[id=name]', function(){
             // Change menu_name where id is equal to the one provided
             let menu_name = $(this).val();
-            let id = $(this).data('id');
+            let id = $(this).parent().data('id');
+            console.log('id: ' + id + ' menu_name: ' + menu_name)
             $.post(
                'update.php',
                {
                   menu_name: menu_name,
                   id: id
-               },
-               function(result){
-                  console.log(menu_name + ' - ' + id)
-                  console.log(result)
                }
             )
          });
