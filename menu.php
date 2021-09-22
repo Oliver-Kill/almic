@@ -42,7 +42,6 @@
             let parent_menu = $(this).parents('.parent') ? $(this).parent().data('id') : 0
             // Ternary because adding a 1 to undefined or NaN value does not work
             let child_index = $(this).parent().data('childindex') ? $(this).parent().data('childindex') + 1 : 1
-            console.log('parent_menu: ' + $(this).parents('.parent') ? $(this).parent().data('id') : 0)
             $.post(
                'insert.php',
                {
@@ -60,7 +59,6 @@
             // Change menu_name where id is equal to the one provided
             let menu_name = $(this).val();
             let id = $(this).parent().data('id');
-            console.log('id: ' + id + ' menu_name: ' + menu_name)
             $.post(
                'update.php',
                {

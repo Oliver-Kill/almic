@@ -34,12 +34,17 @@ if(isset($_POST['submit'])){
 ?>
 <html>
 	<head>
+        <style>
+            label, input {
+                margin:0 5px 5px 0;
+            }
+        </style>
 	</head>
 	<body>
 	<form action="" method="post">
-		<input name="email" type="email">
-		<input name="password" type="password">
-		<input name="remember" type="checkbox">
+        <label for="email">Email</label><input name="email" type="email"><br/>
+        <label for="password">Password</label><input name="password" type="password"><br/>
+        <label for="remember">Remember me</label><input name="remember" type="checkbox"><br/>
 		<input name="submit" type="submit">
 	</form>
 	<script>
